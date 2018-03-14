@@ -11,8 +11,9 @@ The **Isolation Forest** is an unsupervised outlier detection algorithm. It "iso
 
 The **Local Outlier Factor** is also an unsupervised outlier detection algorithm. It computes a score (called local outlier factor) reflecting the degree of abnormality of the observations. It measures the local density deviation of a given data point with respect to its neighbors. The idea is to detect the samples that have a substantially lower density than their neighbors. In practice the local density is obtained from the k-nearest neighbors. The LOF score of an observation is equal to the ratio of the average local density of his k-nearest neighbors, and its own local density: a normal instance is expected to have a local density similar to that of its neighbors, while abnormal data are expected to have much smaller local density.
 The number k of neighbors considered, (alias parameter **n_neighbors**) is typically chosen:
-* Greater than the minimum number of objects a cluster has to contain, so that other objects can be local outliers relative to this cluster.
-* Smaller than the maximum number of close by objects that can potentially be local outliers.
+
+  - Greater than the minimum number of objects a cluster has to contain, so that other objects can be local outliers relative to this cluster.
+  - Smaller than the maximum number of close by objects that can potentially be local outliers.
 
 The differences between **novelty detection** and **outlier detection** algorithms lies on the training phase. While the novelty detection algorithm needs to be trained with a "clean" dataset (not polluted by outliers), the other ones are trained with data that contains outliers. Therefore, the outlier detection algorithms need to fit the central mode of the training data, ignoring the deviant observations.
 
@@ -30,26 +31,32 @@ The differences between **novelty detection** and **outlier detection** algorith
 1. Install Python dependencies `pip install -r requirements.txt`
 
 ## Configure the /etc/spot.conf file
+
 Additionally to the official spot.conf file, it has been added the following parameters:
-* `TRAINING_PATH` : All the algorithms implements a separately training phase. So, this variable represents the input for this stage. This path is used for saving the "clean" dataset (or polluted for the outlier detection algorithms) as well as the output of the training phase, that is, the trained network. Therefore, there will be one trained network per algorithm.
-  * The root path is `${HUSER}/${DSOURCE}/training`, while the path for the algorithms will be `${HUSER}/${DSOURCE}/training/algorithms`
-  > The input dataset should have *csv* extension (e.g.: `limpio.csv`).
 
-    > The trained network name file will be `*algorithm*_network.plk` (e.g.: `OneClassSVM_network.plk`).
+- `TRAINING_PATH` : All the algorithms implements a separately training phase. So, this variable represents the input for this stage. This path is used for saving the "clean" dataset (or polluted for the outlier detection algorithms) as well as the output of the training phase, that is, the trained network. Therefore, there will be one trained network per algorithm.
 
-* `TESTING_PATH` : It combines `FLOW_PATH`, `DNS_PATH` and `PROXY_PATH` in a single variable. It takes the value of the allocation for the ingested data available for the Machine Learning Module.
-  * The root path is `${HUSER}/${DSOURCE}/hive/y=${YR}/m=${MH}/d=${DY}/`.
+    * The root path is `${HUSER}/${DSOURCE}/training`, while the path for the algorithms will be `${HUSER}/${DSOURCE}/training/algorithms`
 
-* `ALGORITHM` : It represents the selected algorithm to be used by the ML module. It can take 3 values: OneClassSVM, IsolationForest or LocalOutlier (*string*). Depending on the choice, it **must** be also configured the following parameters:
-  * OneClassSVM
-    * `NU` : It is an upper bound on the fraction of training errors and a lower bound of the fraction of support vectors. It should be in the interval (0,1] (*float*).
-    * `KERNEL` : It specifies the kernel type to be used in the algorithm. It must be one of `linear`, `poly`, `rbf`, `sigmoid` or `precomputed` (*string*).
-  * IsolationForest
-    * `ESTIMATORS` : It is the number of base estimators in the ensemble (*int*).
-    * `CONTAMINATION` : The amount of contamination of the data set, i.e. the proportion of outliers in the data set. Used when fitting to define the threshold on the decision function. It must be in the interval (0, 0.5) (*float*).
-  * LocalOutlier
-    * `NEIGHBORS` : It is the number of neighbors to use by default for kneighbors queries. If it is larger than the number of samples provided, all samples will be used (*int*).
-    * `CONTAMINATION` : The amount of contamination of the data set, i.e. the proportion of outliers in the data set. When fitting this is used to define the threshold on the decision function. It must be in the interval (0, 0.5) (*float*).
+    > The input dataset should have *csv* extension (e.g.: `limpio.csv`).
+
+    > The trained network name file will be `algorithm_network.plk` (e.g.: `OneClassSVM_network.plk`).
+
+
+- `TESTING_PATH` : It combines `FLOW_PATH`, `DNS_PATH` and `PROXY_PATH` in a single variable. It takes the value of the allocation for the ingested data available for the Machine Learning Module.
+
+    * The root path is `${HUSER}/${DSOURCE}/hive/y=${YR}/m=${MH}/d=${DY}/`.
+
+- `ALGORITHM` : It represents the selected algorithm to be used by the ML module. It can take 3 values: OneClassSVM, IsolationForest or LocalOutlier (*string*). Depending on the choice, it **must** be also configured the following parameters:
+    * OneClassSVM
+        + `NU` : It is an upper bound on the fraction of training errors and a lower bound of the fraction of support vectors. It should be in the interval (0,1] ( *float* ).
+        + `KERNEL` : It specifies the kernel type to be used in the algorithm. It must be one of `linear`, `poly`, `rbf`, `sigmoid` or `precomputed` ( *string* ).
+    * IsolationForest
+        + `ESTIMATORS` : It is the number of base estimators in the ensemble ( *int* ).
+        + `CONTAMINATION` : The amount of contamination of the data set, i.e. the proportion of outliers in the data set. Used when fitting to define the threshold on the decision function. It must be in the interval (0, 0.5) ( *float* ).
+    * LocalOutlier
+        + `NEIGHBORS` : It is the number of neighbors to use by default for kneighbors queries. If it is larger than the number of samples provided, all samples will be used ( *int* ).
+        + `CONTAMINATION` : The amount of contamination of the data set, i.e. the proportion of outliers in the data set. When fitting this is used to define the threshold on the decision function. It must be in the interval (0, 0.5) ( *float* ).
 
 ## Prepare data for input
 
