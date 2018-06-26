@@ -145,17 +145,16 @@ def main_fun(spark_session, args, logger):
     test_df = spark_session.read.format("csv").option("header", "true").load(input_path_test)
 
     # Only for the MouseWorld database, it seems to have a lot of requests to this IP (seem pings to google)
-    train_df = train_df.filter((train_df.da != '8.8.8.8'))
-    test_df = test_df.filter((test_df.da != '8.8.8.8'))
+    # train_df = train_df.filter((train_df.da != '8.8.8.8'))
+    # test_df = test_df.filter((test_df.da != '8.8.8.8'))
 
     train_df = preprocess(train_df, logger)
     test_df = preprocess(test_df, logger)
 
     train_df, test_df = normalize(train_df, test_df, logger)
 
-    # Do whatever with the datasets, here we save the numpy arrays to process them using sklearn and keras
-    np.save('train_data.npy', train_df.toPandas().values)
-    np.save('test_data.npy', test_df.toPandas().values)
+    # Do whatever with train_df and test_df
+
 
 
 if __name__ == "__main__":
