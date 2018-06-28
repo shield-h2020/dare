@@ -34,11 +34,9 @@ The differences between **novelty detection** and **outlier detection** algorith
 
 Additionally to the official spot.conf file, it has been added the following parameters:
 
-- `TRAINING_PATH` : All the algorithms implements a separately training phase. So, this variable represents the input for this stage. This path is used for saving the "clean" dataset (or polluted for the outlier detection algorithms) as well as the output of the training phase, that is, the trained network. Therefore, there will be one trained network per algorithm.
+- `TRAINING_PATH` : All the algorithms implements a separately training phase. So, this variable represents the output for this stage. This path is used for saving the trained network and the minimum-maximum file obtained in the normalization function. Therefore, there will be one trained network per algorithm.
 
     * The root path is `${HUSER}/${DSOURCE}/training`, while the path for the algorithms will be `${HUSER}/${DSOURCE}/training/algorithms`
-
-    > The input dataset should have *csv* extension (e.g.: `limpio.csv`).
 
     > The trained network name file will be `algorithm_network.plk` (e.g.: `OneClassSVM_network.plk`).
 
@@ -60,31 +58,27 @@ Additionally to the official spot.conf file, it has been added the following par
 
 ## Prepare data for input
 
-Depending on the ML phase (train or test), the data must be in different schemas. Regarding the **training** stage, as it is defined previously, the data schema should be a *csv* extension file. For making this data available for this part, the following commands should be executed before starting the training phase:
-
-```shell
-$ hdfs dfs -copyFromLocalFile {path_to_file}/{fileName}.csv {training_path}
-```
-
-The schema used by the **testing** phase is the one provided by the ingestion data via the Spot ingest.
-
-
+The schema used by the **training** and the **testing** phase is the one provided by the ingestion data via the Spot ingest. However, it is necessary to make sure the data used for the **training** stage with the **One Class SVM** algorithm is a clean dataset.
 
 
 ## Run a suspicious connects analysis
 To run a suspicious connects analysis, execute the ml_security.sh script in the ml directory of the MLNODE.
 
 ```
-./ml_security PHASE TYPE [YYYYMMDD]
-```
-The **date** must be only defined for the *testing* phase. Therefore, the training stage only receives the phase and the type parameters.
-
-For example:
-```
-./ml_security train flow
+./ml_security PHASE TYPE YYYYMMDD
 ```
 
-Once it is finished, there should be a file with the trained network in:
+Training:
+```
+./ml_security train flow 20171003
+```
+
+Once it is finished, there should be two files saved in the HDFS filesystem.
+* Minimum-maximum values from the normalization function:
+```
+$HPATH/flow/training/trained_min_max.json
+```
+* Trained network:
 ```
 $HPATH/flow/training/algorithms/OneClassSVM_network.plk
 ```

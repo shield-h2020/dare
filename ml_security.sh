@@ -22,28 +22,19 @@
 PHASE=$1
 DSOURCE=$2
 
-if [ "$PHASE" == "test" ]; then
-    FDATE=$3
-    YR=${FDATE:0:4}
-    MH=${FDATE:4:2}
-    DY=${FDATE:6:2}
-fi
+FDATE=$3
+YR=${FDATE:0:4}
+MH=${FDATE:4:2}
+DY=${FDATE:6:2}
 
 
-if [[ "$PHASE" == "train" && -z "${DSOURCE}" ]]; then
-    echo "ml_security.sh syntax error"
-    echo "Please run ml_security.sh again with the correct syntax:"
-    echo "./ml_security.sh PHASE TYPE"
-    echo "for example:"
-    echo "./ml_security.sh train flow"
-    exit
-elif [[ "$PHASE" == "test"  && ( -z "${DSOURCE}" || "${#FDATE}" != "8" )]]; then
+if [[  -z "${PHASE}" || -z "${DSOURCE}" || "${#FDATE}"  != "8" ]]; then
     echo "ml_security.sh syntax error"
     echo "Please run ml_security.sh again with the correct syntax:"
     echo "./ml_security.sh PHASE TYPE YYYYMMDD"
     echo "for example:"
+    echo "./ml_security.sh train flow 20160122"
     echo "./ml_security.sh test flow 20160122"
-    echo "./ml_security.sh test proxy 20160122"
     exit
 fi
 
@@ -63,8 +54,8 @@ fi
 FEEDBACK_PATH=${HPATH}/feedback/ml_feedback.csv
 
 if [ "$PHASE" == "train" ]; then
-    RAWDATA_PATH=${TRAINING_PATH}
-    HDFS_SCORED_CONNECTS=${TRAINING_PATH}/algorithms
+    RAWDATA_PATH=${TESTING_PATH}
+    HDFS_SCORED_CONNECTS=${TRAINING_PATH}
 else
     RAWDATA_PATH=${TESTING_PATH}
     HDFS_SCORED_CONNECTS=${HPATH}/scores
@@ -103,4 +94,4 @@ time spark2-submit \
   ${PARAMETERS[1]} \
   --input ${RAWDATA_PATH} \
   --output ${HDFS_SCORED_CONNECTS} \
-  --network ${TRAINING_PATH}/algorithms
+  --network ${TRAINING_PATH}
