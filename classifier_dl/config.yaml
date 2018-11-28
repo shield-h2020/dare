@@ -1,0 +1,200 @@
+data:
+  dataset: {name: cleaned_Tuesday, samples: 335919, type: private}
+  datasetLoadOption: full
+  kfold: 1
+  mapping:
+    Class:
+      options: {}
+      port: OutputPort0
+      shape: ''
+      type: Categorical
+    da:
+      options: {}
+      port: ''
+      shape: ''
+      type: Categorical
+    das:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    dir:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    dp:
+      options: {Normalization: false, Scaling: 1}
+      port: InputPort0
+      shape: ''
+      type: Numeric
+    dtos:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    flg:
+      options: {}
+      port: Ignore
+      shape: ''
+      type: Categorical
+    fwd:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    ibyt:
+      options: {Normalization: false, Scaling: 1}
+      port: InputPort0
+      shape: ''
+      type: Numeric
+    in:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    ipkt:
+      options: {Normalization: false, Scaling: 1}
+      port: InputPort0
+      shape: ''
+      type: Numeric
+    obyt:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    opkt:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    out:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    pr:
+      options: {}
+      port: InputPort0
+      shape: ''
+      type: Categorical
+    ra:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    sa:
+      options: {}
+      port: ''
+      shape: ''
+      type: Categorical
+    sas:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    sp:
+      options: {Normalization: false, Scaling: 1}
+      port: InputPort0
+      shape: ''
+      type: Numeric
+    td:
+      options: {Normalization: false, Scaling: 1}
+      port: InputPort0
+      shape: ''
+      type: Numeric
+    tos:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    tr:
+      options: {}
+      port: Ignore
+      shape: ''
+      type: Categorical
+    trday:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    trhour:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    trmin:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    trmonth:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    trsec:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+    tryear:
+      options: {Normalization: false, Scaling: 1}
+      port: Ignore
+      shape: ''
+      type: Numeric
+  numPorts: 1
+  samples: {split: 1, test: 0, training: 268735, validation: 67183}
+  shuffle: true
+model:
+  connections:
+  - {source: Dense_98, target: Dropout_5}
+  - {source: Dense_145, target: Output_4}
+  - {source: Dense_140, target: Dense_98}
+  - {source: BatchNormalization_4, target: Dense_140}
+  - {source: Dropout_5, target: Dense_145}
+  - {source: Input_4, target: BatchNormalization_4}
+  layers:
+  - args: {}
+    class: Input
+    name: Input_4
+    x: 102
+    y: 47
+  - args: {}
+    class: Output
+    name: Output_4
+    x: 729
+    y: 104
+  - args: {activation: relu, output_dim: '12'}
+    class: Dense
+    name: Dense_98
+    x: 436
+    y: 96
+  - args: {activation: relu, output_dim: '36'}
+    class: Dense
+    name: Dense_140
+    x: 106
+    y: 288
+  - args: {activation: softmax, output_dim: '3'}
+    class: Dense
+    name: Dense_145
+    x: 437
+    y: 324
+  - args: {p: '0.1'}
+    class: Dropout
+    name: Dropout_5
+    x: 437
+    y: 215
+  - args: {}
+    class: BatchNormalization
+    name: BatchNormalization_4
+    x: 105
+    y: 165
+params:
+  advance_params: true
+  batch_size: 128
+  is_custom_loss: false
+  loss_func: categorical_crossentropy
+  num_epoch: 10
+  optimizer: {name: Adagrad}
+project: Netflow classification 2 - used for CICIDS2017 CESAR
