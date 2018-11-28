@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.IndexToString","timestamp":1536843260065,"sparkVersion":"2.2.1","uid":"IndexToString_4b27854de86564851933","paramMap":{"labels":["background","wannacry"],"outputCol":"predictedLabel","inputCol":"prediction"}}
