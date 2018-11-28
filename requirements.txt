@@ -1,0 +1,5 @@
+docopt
+schema
+pandas
+numpy
+scikit-learn
