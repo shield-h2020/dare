@@ -9,9 +9,9 @@
 
 This repository contains all the analytics components of the SHIELD Cognitive DA module. You can find the individual README files for each one as follows:
 
-* [Αpache Spot v1.0] - ./README_spot.md
+* [Αpache Spot v1.0] - [link] (README_spot.md)
 
-* [Anomaly Detection] - ./README_anomaly.md
+* [Anomaly Detection] - [link] (README_anomaly.md)
 
-* [Threat classification]- ./classifier_ml/README.md and ./classifier_dl/README_classifier_DL.md
+* [Threat classification]- [link] (/classifier_ml/README.md and ./classifier_dl/README_classifier_DL.md)
 
