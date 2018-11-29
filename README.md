@@ -9,9 +9,9 @@
 
 This repository contains all the analytics components of the SHIELD Cognitive DA module. You can find the individual README files for each one as follows:
 
-* [Αpache Spot v1.0] - [link] (README_spot.md)
+* [Αpache Spot v1.0] - https://github.com/shield-h2020/dare/blob/master/README_spot.md
 
-* [Anomaly Detection] - [link] (README_anomaly.md)
+* [Anomaly Detection] - https://github.com/shield-h2020/dare/blob/master/README_anomaly.md
 
-* [Threat classification]- [link] (/classifier_ml/README.md and ./classifier_dl/README_classifier_DL.md)
+* [Threat classification]- https://github.com/shield-h2020/dare/blob/master/classifier_ml/README.md and https://github.com/shield-h2020/dare/blob/master/classifier_dl/README_classifier_DL.md
 
