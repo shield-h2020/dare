@@ -4,24 +4,30 @@
 
 PHASE=$1
 DSOURCE=$2
+TSOURCE=$3
+SOURCE=$4
 
-FDATE=$3
-YR=${FDATE:0:4}
-MH=${FDATE:4:2}
-DY=${FDATE:6:2}
-
-INPUT_TYPE=$4
-
-
-if [[  -z "${PHASE}" || -z "${DSOURCE}" || "${#FDATE}"  != "8" ]]; then
+if [[  -z "${PHASE}" || -z "${DSOURCE}" || -z "${TSOURCE}" ]]; then
     echo "ml_security.sh syntax error"
     echo "Please run ml_security.sh again with the correct syntax:"
-    echo "./ml_security.sh PHASE TYPE YYYYMMDD"
+    echo "./ml_security.sh PHASE TYPE SOURCE"
     echo "for example:"
-    echo "./ml_security.sh train flow 20160122"
-    echo "./ml_security.sh test flow 20160122"
+    echo "./ml_security.sh train flow csv"
+    echo "./ml_security.sh test flow hive 20160122"
     exit
 fi
+
+if [ "${TSOURCE}" == "hive" ]; then
+    if [ "${#SOURCE}" != "8" ]; then
+        echo "./ml_security.sh test flow hive 20160122"
+        exit
+    else  
+        YR=${SOURCE:0:4}
+        MH=${SOURCE:4:2}
+        DY=${SOURCE:6:2}
+    fi
+fi
+
 
 # read in variables (except for date) from etc/.conf file
 # note: FDATE and DSOURCE *must* be defined prior sourcing this conf file
@@ -38,12 +44,21 @@ fi
 
 FEEDBACK_PATH=${HPATH}/feedback/ml_feedback.csv
 
-if [ "$PHASE" == "train" ]; then
-    RAWDATA_PATH=${TESTING_PATH}
-    HDFS_SCORED_CONNECTS=${TRAINING_PATH}
+if [ ${TSOURCE} == "hive" ]; then
+    if [ "$PHASE" == "train" ]; then
+        RAWDATA_PATH=${TESTING_PATH}
+        HDFS_SCORED_CONNECTS=${TRAINING_PATH}
+    else
+        RAWDATA_PATH=${TESTING_PATH}
+        HDFS_SCORED_CONNECTS=${HPATH}/scores
+    fi
 else
-    RAWDATA_PATH=${TESTING_PATH}
-    HDFS_SCORED_CONNECTS=${HPATH}/scores
+    if [ "$PHASE" == "train" ]; then
+        HDFS_SCORED_CONNECTS=${TRAINING_PATH}
+    else
+        HDFS_SCORED_CONNECTS=${HPATH}/scores
+    fi
+    RAWDATA_PATH=${SOURCE}
 fi
 
 CONTAMINATION=0.05
@@ -79,3 +94,5 @@ time spark2-submit \
     --network ${TRAINING_PATH} \
     --contamination ${CONTAMINATION} \
     --number_outliers ${NUMBER_OUTLIERS} \
+    --input_type ${TSOURCE}\
+
