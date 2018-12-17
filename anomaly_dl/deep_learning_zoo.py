@@ -79,13 +79,13 @@ def train(sample_rdd, epochs = 10, batch_size = 1024):
 
 
 def load_model(logger):
-    '''
-    trained_model = Model.loadModel(
-        'hdfs:///user/spot/combalia/autoencoder_model_101_epoch.pkl',
-        'hdfs:///user/spot/combalia/autoencoder_model_101_epoch.weights')
-    '''
+    logger.info('hdfs://' + args.model_path + 'autoencoder_model_monday.pkl')
+    trained_model = Model.loadModel('hdfs://' + args.model_path + 'autoencoder_model_monday.pkl',
+                                    'hdfs://' + args.model_path + 'autoencoder_model_monday.weights')
+    ''' Legacy hardcoded paths
     trained_model = Model.loadModel('hdfs:///user/spotuser/article/model_monday/training/autoencoder_model_monday.pkl',
                                     'hdfs:///user/spotuser/article/model_monday/training/autoencoder_model_monday.weights')
+    '''
 
     logger.info('Successfully loaded model')
 
@@ -100,9 +100,6 @@ def calculate_outliers(trained_model, rdd, sample_rdd, json_settings_dict):
 
     df = rdd.toDF()
 
-    # roig
-    #df = wannacryLabels(df)
-
     logger.info('Contamination on train: ' + str(args.contamination))
     logger.info('Percentile on train: ' + str(json_settings_dict['percentile']))
 
@@ -111,7 +108,6 @@ def calculate_outliers(trained_model, rdd, sample_rdd, json_settings_dict):
     perc_outliers = float(df_outliers.count()) / float(df.count())
 
     df_outliers = df_outliers.orderBy('score', ascending=False)
-    # ---------------------ROIG-------------------------#
 
     samples = float(df.count())
     len_positives = float(df_outliers.count())
@@ -120,6 +116,7 @@ def calculate_outliers(trained_model, rdd, sample_rdd, json_settings_dict):
     logger.info('total number of samples: ' + str(samples))
     logger.info('total detected outliers: ' + str(len_positives))
 
+    # If there is a label this means that we can calculate accuracies and other parameters
     if 'label' in df.columns:
 
         df_outliers = df_outliers.select(df_outliers.tdur,
@@ -155,7 +152,6 @@ def calculate_outliers(trained_model, rdd, sample_rdd, json_settings_dict):
         logger.info('accuracy: ' + str(accuracy))
         logger.info('precision: ' + str(precision))
         logger.info('recall: ' + str(recall))
-        # --------------------------------------------------#
     else:
 
         df_outliers = df_outliers.select(df_outliers.treceived,
@@ -318,9 +314,10 @@ def save_results(df_outliers, hdfsScoredDir):
 def main_fun(sparkSession, args, logger):
     json_settings = "json_settings.json"
 
+    #Read dataframe
     df = read_dataframe(sparkSession, args, logger)
+    #Obtain the features from the dataframe
     df = obtain_features(df)
-
     logger.info(str(args))
 
     hdfs_json_settings = args.network + "/" + json_settings
@@ -339,17 +336,16 @@ def main_fun(sparkSession, args, logger):
 
     if args.mode == 'train':
         trained_model = train(sample_rdd, epochs=10, batch_size=1024)
-        # variable
+        # save the model
+        trained_model.saveModel('hdfs://' + model_path + 'autoencoder_model_monday.pkl',\
+        'hdfs://' + model_path + 'autoencoder_model_monday.weights', True)
         '''
-        trained_model.saveModel('hdfs:///user/spot/combalia/autoencoder_model_101_epoch.pkl',
-                                'hdfs:///user/spot/combalia/autoencoder_model_101_epoch.weights',
-                                True)
-        '''
-        #----------ROIG---------
+        #----------legacy static code---------
         trained_model.saveModel('hdfs:///user/spotuser/article/model_monday/training/autoencoder_model_monday.pkl',
                                 'hdfs:///user/spotuser/article/model_monday/training/autoencoder_model_monday.weights',
                                 True)
-        # ----------ROIG---------
+        # -------------------
+        '''
         percentile = calculate_percentile(trained_model, rdd, sample_rdd)
         json_settings_dict['percentile'] = percentile
         save_settings(json_settings_dict, hdfs_json_settings)
@@ -365,16 +361,17 @@ def main_fun(sparkSession, args, logger):
 
 
 if __name__ == "__main__":
+    #Parse the arguments of the call
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--mode', required=True, help='Train or test')
-    parser.add_argument('--input', required=True, help='Path for the train input csv')
-    parser.add_argument('--output', required=False, help='Path for the test input csv')
+    parser.add_argument('--input', required=True, help='Path for the train input')
+    parser.add_argument('--model_path', required=True, help='Path to save/load the model')
+    parser.add_argument('--output', required=False, help='Path for the test input')
     parser.add_argument('--network', required=False, help='Path of the trained network')
+    parser.add_argument('--contamination', required=True, type=float, help='Contamination ratio (from 0 to 1)')
+    parser.add_argument('--input_type', required=False, help='csv or hive')
 
-    parser.add_argument('--contamination', required=True, type=float)
-    parser.add_argument('--number_outliers', required=True, type=int)
-    parser.add_argument('--input_type', required=False)
 
     args = parser.parse_args()
 
@@ -382,7 +379,7 @@ if __name__ == "__main__":
                    .builder\
                    .appName("Security ML")\
                    .getOrCreate()
-
+    #Logging section
     Level = sparkSession.sparkContext._gateway.jvm.org.apache.log4j.Level
     LogManager = sparkSession.sparkContext._gateway.jvm.org.apache.log4j.LogManager
     Logger = sparkSession.sparkContext._gateway.jvm.org.apache.log4j.Logger
@@ -397,11 +394,12 @@ if __name__ == "__main__":
 
     redire_spark_logs()
     show_bigdl_info_logs()
-
+    #init BigDL
     init_engine()
-
     logger.info("Successfully loaded BIGDL")
 
+    #Init main
     main_fun(sparkSession, args, logger)
 
+    #Clean spark session
     sparkSession.stop()

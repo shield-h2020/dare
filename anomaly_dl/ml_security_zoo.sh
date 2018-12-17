@@ -6,14 +6,15 @@ PHASE=$1
 DSOURCE=$2
 TSOURCE=$3
 SOURCE=$4
+MODEL_PATH=$5
 
-if [[  -z "${PHASE}" || -z "${DSOURCE}" || -z "${TSOURCE}" ]]; then
+if [[  -z "${PHASE}" || -z "${DSOURCE}" || -z "${TSOURCE}" || -z "${MODEL_PATH}" ]]; then
     echo "ml_security.sh syntax error"
     echo "Please run ml_security.sh again with the correct syntax:"
     echo "./ml_security.sh PHASE TYPE SOURCE"
     echo "for example:"
-    echo "./ml_security.sh train flow csv"
-    echo "./ml_security.sh test flow hive 20160122"
+    echo "./ml_security.sh train flow csv <PATH_TO_CSV_IN_HDFS> <PATH_TO_MODEL_IN_HDFS>"
+    echo "./ml_security.sh test flow hive 20160122 <PATH_TO_MODEL_IN_HDFS>"
     exit
 fi
 
@@ -62,7 +63,6 @@ else
 fi
 
 CONTAMINATION=0.05
-NUMBER_OUTLIERS=100
 
 ANALYTICS_ZOO_ROOT=./dependencies
 ANALYTICS_ZOO_HOME=${ANALYTICS_ZOO_ROOT}/zoo
@@ -90,9 +90,9 @@ time spark2-submit \
     deep_learning_zoo.py \
     --mode ${PHASE} \
     --input ${RAWDATA_PATH} \
+    --model_path ${MODEL_PATH}\
     --output ${HDFS_SCORED_CONNECTS} \
     --network ${TRAINING_PATH} \
     --contamination ${CONTAMINATION} \
-    --number_outliers ${NUMBER_OUTLIERS} \
     --input_type ${TSOURCE}\
 
